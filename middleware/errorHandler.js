@@ -11,7 +11,9 @@ const errorHandler = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     // Multer error occurred
     res.status(400).json({ message: err.message });
-  } else {
+  }
+  
+  else {
     const status = res.statusCode ? res.statusCode : 500; // server error
 
     res.status(status);

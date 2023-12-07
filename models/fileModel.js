@@ -5,27 +5,22 @@ const fileSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  thumbnail: {
-    type: Buffer, // Assuming your thumbnail is stored as a Buffer
+  description: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: String,
     required: true,
   },
   filedata: {
     type: Buffer,
     required: true,
   },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // Assuming you have a User model
-    required: true,
-  },
   contentType: {
     type: String,
     required: true,
-  },
-  uploadedDate: {
-    type: Date,
-    default: Date.now,
-  },
+  }
 });
 
 const File = mongoose.model("File", fileSchema);

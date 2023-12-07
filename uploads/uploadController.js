@@ -3,51 +3,76 @@ const File = require("../models/fileModel");
 const upload = require("../config/multerConfig");
 const asyncHandler = require("express-async-handler");
 
-const uploadFile = asyncHandler(
-  upload,
-  asyncHandler(async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No file provided" });
-      }
+// const uploadFile = asyncHandler(upload,(async (req, res) => {
+//   console.log("req.user:", req.user); // Log the req.user
+//   console.log("req.userId:", req.userId); // Log the req.userId
+//   console.log("req.file:", req.file); // Log the req.file
+//   console.log("req.body:", req.body); // Log the req.body
+//   if (!req.userId) {
+//     return res.status(401).json({ error: "Unauthorized" });
+//   }
 
-      // Read the file as binary data
-      const fileData = fs.readFileSync(req.file.path);
+//   const userId = req.userId;
+//   const file = req.file;
+//   const filedata = fs.readFileSync(file.path);
+//   const contentType = file.mimetype;
 
-      // Create a new File document with the uploaded file's metadata and binary data
-      const fileDoc = new File({
-        filename: req.file.originalname,
-        title: req.body.title,
-        userId: req.body.userId,
-        thumbnail: req.file.buffer,
-        filedata: fileData,
-        contentType: req.file.mimetype,
-        uploadedDate: new Date(),
-      });
+//   try {
+//     if (!file) {
+//       return res.status(400).json({ error: "No file provided" });
+//     }
 
-      // Save the File document to the database
-      await fileDoc.save();
+//     const newFile = new File({
+//       // title: req.body.title,
+//       // description: req.body.description,
+//       // userId: userId,
+//       filedata: filedata,
+//       contentType: contentType,
+//     });
 
-      // Delete the temporary file
-      fs.unlinkSync(req.file.path);
+//     fs.unlinkSync(file.path);
 
-      res.json({
-        success: true,
-        filename: req.file.originalname,
-        _id: fileDoc._id,
-        contentType: req.file.mimetype,
-        uploadedDate: fileDoc.uploadedDate,
-        method: {
-          type: "POST",
-          url: "http://localhost:3000/uploads/stream/" + fileDoc._id,
-        },
-      });
-    } catch (error) {
-      console.error("Unexpected error during file upload:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+//     await newFile.save();
+
+//     res.json({
+//       success: true,
+//       message: "File uploaded successfully",
+//       method: {
+//         type: "GET",
+//         url: "http://localhost:3000/video/files",
+//       },
+//     });
+//   } catch (err) {
+//     console.error("Error:", err);
+//     return res.status(500).send("Internal Server Error");
+//   }
+// }));
+
+const uploadFile = asyncHandler(async (req, res) => {
+  const file = req.file
+  const filedata = fs.readFileSync(file.path);
+
+  const newFile = new File({
+    title: req.body.title,
+    description: req.body.description,
+    userId: req.userId,
+    filedata: filedata,
+    contentType: file.mimetype
+  })
+
+  fs.unlinkSync(file.path)
+
+  await newFile.save()
+
+  res.json({
+    success: true,
+    message: "File uploaded successfully",
+    method: {
+      type: "GET",
+      url: "http://localhost:3000/video/files"
     }
   })
-);
+})
 
 const streamFile = asyncHandler(async (req, res) => {
   const fileId = req.params.id;
@@ -91,6 +116,7 @@ const getAllFiles = asyncHandler(async (req, res) => {
 
     // Return the files
     res.json({
+      count: files.length,
       success: true,
       files: files,
       method: {
@@ -108,7 +134,7 @@ const getFilebyId = asyncHandler(async (req, res) => {
   const { fileid } = req.params;
 
   try {
-    if (!file) {
+    if (!file || file.length === 0) {
       return res.status(404).json({ error: "File not found" });
     }
 
@@ -120,15 +146,14 @@ const getFilebyId = asyncHandler(async (req, res) => {
       file: file,
       method: {
         type: "GET",
-        url: "http://localhost:3000/uploads/files",
+        url: "http://localhost:3000/video/files",
       },
-    })
-  }
-  catch (error) {
+    });
+  } catch (error) {
     console.error("Error getting file:", error);
     res.status(500).json({ error: error.message });
   }
-})
+});
 
 const getAllFIlesbyUser = asyncHandler(async (req, res) => {
   try {
@@ -259,4 +284,4 @@ module.exports = {
   deleteFilebyUser,
   deleteAllFIlesbyUser,
   deleteAllFiles,
-}
+};
