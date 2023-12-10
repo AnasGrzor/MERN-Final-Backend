@@ -5,12 +5,16 @@ const fileSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  username: {
+    type: String,
+    required: true,
+  },
   description: {
     type: String,
     required: true,
   },
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   filedata: {
@@ -20,6 +24,10 @@ const fileSchema = new mongoose.Schema({
   contentType: {
     type: String,
     required: true,
+  },  
+  createdAt: {
+    type: Date,
+    default: Date.now,
   }
 });
 

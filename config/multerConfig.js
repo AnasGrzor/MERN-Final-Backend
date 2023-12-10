@@ -14,10 +14,10 @@ const storage = multer.diskStorage({
 // Init upload
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10000000 }, // Limit file size to 10MB
+  limits: { fileSize: 15000000 }, // Limit file size to 10MB
   fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
-  }
+  },
 }).single("myVideo");
 
 // Check file type

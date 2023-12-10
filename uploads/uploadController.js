@@ -2,133 +2,172 @@ const fs = require("fs");
 const File = require("../models/fileModel");
 const upload = require("../config/multerConfig");
 const asyncHandler = require("express-async-handler");
+const mongoose = require("mongoose");
+const nodeCache = require("node-cache");
+myCache = new nodeCache({ stdTTL: 3600 });
 
-// const uploadFile = asyncHandler(upload,(async (req, res) => {
-//   console.log("req.user:", req.user); // Log the req.user
-//   console.log("req.userId:", req.userId); // Log the req.userId
-//   console.log("req.file:", req.file); // Log the req.file
-//   console.log("req.body:", req.body); // Log the req.body
-//   if (!req.userId) {
-//     return res.status(401).json({ error: "Unauthorized" });
-//   }
-
-//   const userId = req.userId;
-//   const file = req.file;
-//   const filedata = fs.readFileSync(file.path);
-//   const contentType = file.mimetype;
-
-//   try {
-//     if (!file) {
-//       return res.status(400).json({ error: "No file provided" });
-//     }
-
-//     const newFile = new File({
-//       // title: req.body.title,
-//       // description: req.body.description,
-//       // userId: userId,
-//       filedata: filedata,
-//       contentType: contentType,
-//     });
-
-//     fs.unlinkSync(file.path);
-
-//     await newFile.save();
-
-//     res.json({
-//       success: true,
-//       message: "File uploaded successfully",
-//       method: {
-//         type: "GET",
-//         url: "http://localhost:3000/video/files",
-//       },
-//     });
-//   } catch (err) {
-//     console.error("Error:", err);
-//     return res.status(500).send("Internal Server Error");
-//   }
-// }));
-
+// @desc upload file
 const uploadFile = asyncHandler(async (req, res) => {
-  const file = req.file
+  console.log(req);
+  const file = req.file;
   const filedata = fs.readFileSync(file.path);
 
-  const newFile = new File({
+  const FileDoc = new File({
     title: req.body.title,
-    description: req.body.description,
+    username: req.user,
+    description: req.body.Description,
     userId: req.userId,
     filedata: filedata,
-    contentType: file.mimetype
-  })
+    contentType: file.mimetype,
+  });
 
-  fs.unlinkSync(file.path)
+  fs.unlinkSync(file.path);
 
-  await newFile.save()
+  await FileDoc.save();
 
   res.json({
     success: true,
+    status: 200,
+    username: req.user,
+    title: req.body.title,
+    description: req.body.Description,
     message: "File uploaded successfully",
     method: {
       type: "GET",
-      url: "http://localhost:3000/video/files"
-    }
-  })
-})
+      url: "http://localhost:3000/video/files",
+    },
+  });
+});
 
 const streamFile = asyncHandler(async (req, res) => {
   const fileId = req.params.id;
+  const range = req.headers.range;
+
+  const fileDoc = await File.findById(fileId);
 
   try {
-    const fileDoc = await File.findById(fileId); // Fetch the file from the database
-
     if (!fileDoc) {
-      console.log("File not found:", fileId);
       return res.status(404).send("File not found");
     }
 
+    if (!range) {
+      console.log("Range header not provided");
+      return res.status(400).send("Range header not provided");
+    }
+
+     // Fetch the file from the database
+
     const videoBuffer = fileDoc.filedata.buffer; // Get the video data from the file document
     const videoSize = videoBuffer.byteLength; // Get the size of the video data
-    console.log("Video size:", videoSize);
+
+    const chunkSize = 10 ** 6; // Set the chunk size to 1 MB
+    const start = Number(range.replace(/\D/g, "")); // Get the start of the range
+    const end = Math.min(start + chunkSize, videoSize - 1); // Get the end of the range
 
     const headers = {
-      "Content-Length": videoBuffer.byteLength,
+      "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": end - start + 1,
       "Content-Type": "video/mp4", // Make sure this is the correct MIME type for your video
     };
 
     console.log("Response headers:", headers);
     res.writeHead(206, headers);
 
-    return res.end(Buffer.from(videoBuffer)); // Send the video data as a responsevideoBuffer);
+    const videoStream = Buffer.from(videoBuffer.slice(start, end + 1)); // Get the video data from the buffer
+
+    res.write(videoStream); // Pipe the video data to the response
+
+    res.on("close", () => {
+      res.end();
+    })
+
   } catch (err) {
     console.error("Error:", err);
     return res.status(500).send("Internal Server Error");
   }
 });
 
+const updateFile = asyncHandler(async (req, res) => {
+  const fileId = req.params.id;
+  const { title, description } = req.body;
+
+  await File.findByIdAndUpdate(fileId, { title, description });
+
+  res.json({
+    success: true,
+    status: 200,
+    message: "File updated successfully",
+    method: {
+      type: "GET",
+      url: "http://localhost:3000/video/files",
+    },
+  });
+});
+
 const getAllFiles = asyncHandler(async (req, res) => {
   try {
-    // Use async/await to wait for the query to execute
-    const files = await File.find();
-    console.log("Files:", files);
+    if (myCache.has("allFiles")) {
+      const cachedFiles = myCache.get("allFiles");
+      return res.json(cachedFiles);
+    } else {
+      const files = await File.find({}).select({ filedata: 0 });
+      // console.log("Files:", files);
 
-    if (!files || files.length === 0) {
-      return res.status(404).json({ error: "No files found" });
+      if (!files || files.length === 0) {
+        return res.status(404).json({ error: "No files found" });
+      }
+
+      // Process the files
+      const processedFiles = processFiles(files);
+
+      // Cache the processed files
+      myCache.set("allFiles", processedFiles);
+
+      // Return the files
+      res.json(processedFiles);
     }
-
-    // Return the files
-    res.json({
-      count: files.length,
-      success: true,
-      files: files,
-      method: {
-        type: "GET",
-        url: "http://localhost:3000/video/files",
-      },
-    });
   } catch (error) {
     console.error("Error getting files:", error);
     res.status(500).json({ error: error.message });
   }
 });
+
+function processFiles(files) {
+  return {
+    count: files.length,
+    success: true,
+    files: files.map((file) => ({
+      id: file._id,
+      userId: file.userId,
+      title: file.title,
+      description: file.description,
+      contentType: file.contentType,
+      createdAt: file.createdAt,
+    })),
+    method: {
+      type: "GET",
+      url: "http://localhost:3000/video/files",
+    },
+  };
+}
+
+// const getAllFiles = asyncHandler(async (req, res) => {
+//   try {
+//     const files = await File.find();
+//     res.json({
+//       success: true,
+//       files: files,
+//       method: {
+//         type: "GET",
+//         url: "http://localhost:3000/video/files",
+//       },
+//     })
+//   } catch (error) {
+//     console.error("Error getting files:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// })
 
 const getFilebyId = asyncHandler(async (req, res) => {
   const { fileid } = req.params;
@@ -278,6 +317,7 @@ module.exports = {
   getAllFiles,
   getAllFIlesbyUser,
   getFilebyId,
+  updateFile,
   streamFile,
   uploadFile,
   deleteFile,
