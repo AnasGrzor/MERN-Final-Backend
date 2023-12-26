@@ -57,31 +57,16 @@ const streamFile = asyncHandler(async (req, res) => {
 
      // Fetch the file from the database
 
-    const videoBuffer = fileDoc.filedata.buffer; // Get the video data from the file document
+     const videoBuffer = fileDoc.filedata.buffer; // Get the video data from the file document
     const videoSize = videoBuffer.byteLength; // Get the size of the video data
-
-    const chunkSize = 10 ** 6; // Set the chunk size to 1 MB
-    const start = Number(range.replace(/\D/g, "")); // Get the start of the range
-    const end = Math.min(start + chunkSize, videoSize - 1); // Get the end of the range
-
+    console.log("Video size:", videoSize);
     const headers = {
-      "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-      "Accept-Ranges": "bytes",
-      "Content-Length": end - start + 1,
+      "Content-Length": videoBuffer.byteLength,
       "Content-Type": "video/mp4", // Make sure this is the correct MIME type for your video
     };
-
     console.log("Response headers:", headers);
     res.writeHead(206, headers);
-
-    const videoStream = Buffer.from(videoBuffer.slice(start, end + 1)); // Get the video data from the buffer
-
-    res.write(videoStream); // Pipe the video data to the response
-
-    res.on("close", () => {
-      res.end();
-    })
-
+    return res.end(Buffer.from(videoBuffer)); // Send the video data as a responsevideoBuffer);
   } catch (err) {
     console.error("Error:", err);
     return res.status(500).send("Internal Server Error");
