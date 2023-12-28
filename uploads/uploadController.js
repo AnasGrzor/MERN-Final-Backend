@@ -57,14 +57,14 @@ const streamFile = asyncHandler(async (req, res) => {
 
      // Fetch the file from the database
 
-     const videoBuffer = fileDoc.filedata.buffer; // Get the video data from the file document
+    const videoBuffer = fileDoc.filedata.buffer; // Get the video data from the file document
     const videoSize = videoBuffer.byteLength; // Get the size of the video data
-    console.log("Video size:", videoSize);
+    
     const headers = {
       "Content-Length": videoBuffer.byteLength,
-      "Content-Type": "video/mp4", // Make sure this is the correct MIME type for your video
+      "Content-Type": "video/mp4", 
     };
-    console.log("Response headers:", headers);
+    
     res.writeHead(206, headers);
     return res.end(Buffer.from(videoBuffer)); // Send the video data as a responsevideoBuffer);
   } catch (err) {
