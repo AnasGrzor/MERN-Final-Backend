@@ -19,7 +19,7 @@ app.use(logger);
 
 connectDB();
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 //routes
 app.use("/auth", require("./routes/authRoutes"));

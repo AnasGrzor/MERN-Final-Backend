@@ -1,0 +1,2 @@
+20231227	16:27:34	959cb00e-dc62-4274-bd25-b90996a6b672	Error: Not allowed by CORS	OPTIONS	/auth/login	http://localhost:3001
+20231227	16:27:45	21ac4045-a4ce-42a0-9b61-001f09d7c59b	Error: Not allowed by CORS	OPTIONS	/auth/login	http://localhost:3001
