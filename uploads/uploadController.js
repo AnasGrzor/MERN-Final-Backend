@@ -79,6 +79,9 @@ const streamFile = asyncHandler(async (req, res) => {
     const headers = {
       "Content-Length": videoSize,
       "Content-Type": "video/mp4",
+      'Access-Control-Allow-Origin': '*',
+      "Access-Control-Allow-Headers":
+      "Origin, X-Requested-With, Content-Type, Accept"
     };
 
     res.writeHead(206, headers);
