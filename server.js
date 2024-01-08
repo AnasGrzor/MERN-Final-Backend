@@ -27,6 +27,10 @@ app.use("/api/video", require("./uploads/uploadRoutes"));
 
 app.use(errorHandler);
 
+res.get("/", (req, res) => {
+  res.send("API is running...");
+})
+
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
