@@ -27,7 +27,7 @@ app.use("/api/video", require("./uploads/uploadRoutes"));
 
 app.use(errorHandler);
 
-res.get("/", (req, res) => {
+app.get("/", (req, res) => {
   res.send("API is running...");
 })
 
