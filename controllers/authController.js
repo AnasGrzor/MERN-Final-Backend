@@ -28,7 +28,6 @@ const login = asyncHandler(async (req, res) => {
       UserInfo: {
         userId: foundUser._id,
         username: foundUser.username,
-        
       },
     },
     process.env.ACCESS_TOKEN_SECRET,
@@ -49,8 +48,15 @@ const login = asyncHandler(async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
   });
 
-  // Send accessToken containing username and roles
-  res.json({ accessToken });
+  const profile = {
+    _id: foundUser._id,
+    username: foundUser.username,
+    profilePic: foundUser.profilePic,
+    email: foundUser.email,
+  };
+
+  // Send accessToken containing username
+  res.json({ accessToken, profile });
 });
 
 // @desc Refresh
@@ -71,7 +77,6 @@ const refresh = (req, res) => {
 
       const foundUser = await User.findOne({
         username: decoded.username,
-
       }).exec();
 
       if (!foundUser) return res.status(401).json({ message: "Unauthorized" });
@@ -81,7 +86,6 @@ const refresh = (req, res) => {
           UserInfo: {
             userId: foundUser._id,
             username: foundUser.username,
-            
           },
         },
         process.env.ACCESS_TOKEN_SECRET,

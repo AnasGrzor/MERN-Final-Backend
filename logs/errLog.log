@@ -1,2 +1,26 @@
 20231227	16:27:34	959cb00e-dc62-4274-bd25-b90996a6b672	Error: Not allowed by CORS	OPTIONS	/auth/login	http://localhost:3001
 20231227	16:27:45	21ac4045-a4ce-42a0-9b61-001f09d7c59b	Error: Not allowed by CORS	OPTIONS	/auth/login	http://localhost:3001
+20231228	19:20:34	36f86a9a-6f5e-4e26-aedb-35ca0ec39cbf	Error: ENOENT: no such file or directory, open 'C:\Users\Anas\Code\Web\MERN\Backend\uploads\videos\video-1703773234577'	POST	/api/video/upload	http://localhost:3000
+20231228	19:20:39	cb6df349-a25e-4f4a-98dd-90871761f18a	Error: ENOENT: no such file or directory, open 'C:\Users\Anas\Code\Web\MERN\Backend\uploads\videos\video-1703773239589'	POST	/api/video/upload	http://localhost:3000
+20231228	19:20:41	4b90b014-e851-49fd-864b-39c49b228bd3	Error: ENOENT: no such file or directory, open 'C:\Users\Anas\Code\Web\MERN\Backend\uploads\videos\video-1703773241367'	POST	/api/video/upload	http://localhost:3000
+20231228	19:20:46	1ccdb5f4-b0fd-414b-ad64-1a58755997cc	Error: ENOENT: no such file or directory, open 'C:\Users\Anas\Code\Web\MERN\Backend\uploads\videos\video-1703773246387'	POST	/api/video/upload	http://localhost:3000
+20231228	19:24:34	e22445c3-5ea7-4cfc-b15c-1c969c3d49ba	Error: ENOENT: no such file or directory, open 'C:\Users\Anas\Code\Web\MERN\Backend\uploads\videos\video-1703773474760'	POST	/api/video/upload	http://localhost:3000
+20231228	19:24:39	0c269fd9-7632-4db4-8357-66fc82a92573	Error: ENOENT: no such file or directory, open 'C:\Users\Anas\Code\Web\MERN\Backend\uploads\videos\video-1703773479769'	POST	/api/video/upload	http://localhost:3000
+20231228	19:24:40	e0ceb9b9-d98d-45b8-a4ba-1b79fda05739	Error: ENOENT: no such file or directory, open 'C:\Users\Anas\Code\Web\MERN\Backend\uploads\videos\video-1703773480525'	POST	/api/video/upload	http://localhost:3000
+20231228	19:24:56	39f440a0-f35e-48fc-9071-bb214476a999	Error: ENOENT: no such file or directory, open 'C:\Users\Anas\Code\Web\MERN\Backend\uploads\videos\video-1703773496077'	POST	/api/video/upload	http://localhost:3000
+20231228	19:25:01	1ace4e5b-cd14-4980-ab08-691b65a94579	Error: ENOENT: no such file or directory, open 'C:\Users\Anas\Code\Web\MERN\Backend\uploads\videos\video-1703773501082'	POST	/api/video/upload	http://localhost:3000
+20231228	19:25:39	fac49a0e-aa2f-46de-b501-9f172c8f900e	ValidationError: File validation failed: category: Path `category` is required.	POST	/api/video/upload	http://localhost:3000
+20231228	22:19:01	12696c57-40b4-416a-a3a2-222f82600aab	ValidationError: File validation failed: username: Path `username` is required., userId: Path `userId` is required.	POST	/api/video/upload	http://localhost:3000
+20231228	22:22:28	c01f03ea-4144-48fd-b59f-5fd7c5421842	ValidationError: File validation failed: username: Path `username` is required., userId: Path `userId` is required.	POST	/api/video/upload	http://localhost:3000
+20231228	22:25:54	6c51e6e4-58b8-4140-979c-da0e434102fa	ValidationError: File validation failed: username: Path `username` is required., userId: Path `userId` is required.	POST	/api/video/upload	http://localhost:3000
+20231228	22:27:54	9acd6a71-4130-450d-845f-e3df02805909	ValidationError: File validation failed: username: Path `username` is required., userId: Path `userId` is required.	POST	/api/video/upload	http://localhost:3000
+20231228	22:29:52	1578c039-8456-4c90-8b25-c12960fffdf1	ValidationError: File validation failed: username: Path `username` is required., userId: Path `userId` is required.	POST	/api/video/upload	http://localhost:3000
+20231228	22:31:37	e119231d-5aa3-40f4-9ba5-51318aacd22a	ValidationError: File validation failed: username: Path `username` is required., userId: Path `userId` is required.	POST	/api/video/upload	http://localhost:3000
+20231228	22:32:31	2d7a4ed1-2175-4b82-bbaa-20e006bea6f7	ValidationError: File validation failed: username: Path `username` is required., userId: Path `userId` is required.	POST	/api/video/upload	http://localhost:3000
+20231228	22:37:35	4ac214be-4d79-4495-8bad-a630a669b6e0	CastError: Cast to ObjectId failed for value "{ fileid: undefined }" (type Object) at path "_id" for model "File"	GET	/api/video/file/658db151b07e5e8a3f69c01d	undefined
+20231228	22:48:23	ab302942-e7e8-4c88-8f8c-43dd1997ce5f	ReferenceError: fileid is not defined	GET	/api/video/file/658d870d3001fc2688b63489	undefined
+20240108	16:54:43	599b6f34-efa2-4c9d-9b96-526c0540e8d4	ValidationError: File validation failed: username: Path `username` is required., userId: Path `userId` is required.	POST	/api/video/upload	http://localhost:3000
+20240108	16:58:49	3a4a4306-0395-4cf6-8cad-f3ceca721560	ValidationError: File validation failed: username: Path `username` is required.	POST	/api/video/upload	http://localhost:3000
+20240108	17:09:10	f0e69313-7bdc-452d-ad58-90db7ca79c46	ValidationError: File validation failed: username: Path `username` is required.	POST	/api/video/upload	http://localhost:3000
+20240108	17:15:03	e53c08d3-8476-40e4-86e1-fd9f180205ac	ValidationError: File validation failed: username: Path `username` is required., userId: Path `userId` is required.	POST	/api/video/upload	http://localhost:3000
+20240108	17:59:17	16aa980f-b761-4589-9e5c-d7bd57876e0a	ReferenceError: password is not defined	PATCH	/api/users/658d8c8970571fec3f34215c	http://localhost:3000

@@ -1,6 +1,5 @@
 const fs = require("fs");
 const File = require("../models/fileModel");
-const upload = require("../config/multerConfig");
 const asyncHandler = require("express-async-handler");
 const mongoose = require("mongoose");
 const nodeCache = require("node-cache");
@@ -12,6 +11,21 @@ const uploadFile = asyncHandler(async (req, res) => {
   const file = req.file;
   const filedata = fs.readFileSync(file.path);
 
+  if (!file) {
+    res.status(400);
+    throw new Error("Please upload a video");
+  }
+
+  if (!req.body.title || !req.body.Description || !req.body.category) {
+    res.status(400);
+    throw new Error("Please add all fields");
+  }
+
+  if (file.mimetype !== "video/mp4") {
+    res.status(400);
+    throw new Error("Please upload a mp4 file");
+  }
+
   const FileDoc = new File({
     title: req.body.title,
     username: req.user,
@@ -19,6 +33,8 @@ const uploadFile = asyncHandler(async (req, res) => {
     userId: req.userId,
     filedata: filedata,
     contentType: file.mimetype,
+    category: req.body.category,
+    pfp: req.body.pfp,
   });
 
   fs.unlinkSync(file.path);
@@ -55,16 +71,16 @@ const streamFile = asyncHandler(async (req, res) => {
       return res.status(400).send("Range header not provided");
     }
 
-     // Fetch the file from the database
+    // Fetch the file from the database
 
     const videoBuffer = fileDoc.filedata.buffer; // Get the video data from the file document
     const videoSize = videoBuffer.byteLength; // Get the size of the video data
-    
+
     const headers = {
-      "Content-Length": videoBuffer.byteLength,
-      "Content-Type": "video/mp4", 
+      "Content-Length": videoSize,
+      "Content-Type": "video/mp4",
     };
-    
+
     res.writeHead(206, headers);
     return res.end(Buffer.from(videoBuffer)); // Send the video data as a responsevideoBuffer);
   } catch (err) {
@@ -75,14 +91,18 @@ const streamFile = asyncHandler(async (req, res) => {
 
 const updateFile = asyncHandler(async (req, res) => {
   const fileId = req.params.id;
-  const { title, description } = req.body;
+  const { title, description, category } = req.body;
 
-  await File.findByIdAndUpdate(fileId, { title, description });
+  await File.findByIdAndUpdate(fileId, { title, description, category });
 
   res.json({
     success: true,
     status: 200,
     message: "File updated successfully",
+    username: req.user,
+    title: req.body.title,
+    description: req.body.Description,
+    category: req.body.category,
     method: {
       type: "GET",
       url: "http://localhost:3000/video/files",
@@ -96,7 +116,7 @@ const getAllFiles = asyncHandler(async (req, res) => {
       const cachedFiles = myCache.get("allFiles");
       return res.json(cachedFiles);
     } else {
-      const files = await File.find({}).select({ filedata: 0 });
+      const files = await File.find({}).select({ filedata: 0 }).lean();
       // console.log("Files:", files);
 
       if (!files || files.length === 0) {
@@ -129,6 +149,8 @@ function processFiles(files) {
       description: file.description,
       contentType: file.contentType,
       createdAt: file.createdAt,
+      category: file.category,
+      pfp: file.uploaderPfp,
     })),
     method: {
       type: "GET",
@@ -137,33 +159,37 @@ function processFiles(files) {
   };
 }
 
-// const getAllFiles = asyncHandler(async (req, res) => {
-//   try {
-//     const files = await File.find();
-//     res.json({
-//       success: true,
-//       files: files,
-//       method: {
-//         type: "GET",
-//         url: "http://localhost:3000/video/files",
-//       },
-//     })
-//   } catch (error) {
-//     console.error("Error getting files:", error);
-//     res.status(500).json({ error: error.message });
-//   }
-// })
-
-const getFilebyId = asyncHandler(async (req, res) => {
-  const { fileid } = req.params;
+const getFilesByCategory = asyncHandler(async (req, res) => {
+  const { category } = req.params;
 
   try {
-    if (!file || file.length === 0) {
+    const files = await File.find({ category }).select({ filedata: 0 }).lean();
+
+    if (!files || files.length === 0) {
+      return res.status(404).json({ error: "No files found" });
+    }
+
+    const processedFiles = processFiles(files);
+
+    res.json(processedFiles);
+  } catch (error) {
+    console.error("Error getting files:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+const getFilebyId = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const file = await File.findById(id).select({ filedata: 0 }).lean();
+  console.log("File:", file);
+
+  try {
+    if (!file) {
       return res.status(404).json({ error: "File not found" });
     }
 
     // Use async/await to wait for the query to execute
-    const file = await File.findById(fileid);
 
     res.json({
       success: true,
@@ -301,6 +327,7 @@ const deleteAllFiles = asyncHandler(async (req, res) => {
 module.exports = {
   getAllFiles,
   getAllFIlesbyUser,
+  getFilesByCategory,
   getFilebyId,
   updateFile,
   streamFile,

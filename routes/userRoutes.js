@@ -6,14 +6,10 @@ verifyJWT = require("../middleware/verifyJWT");
 
 router.post("/register",userController.createUser);
 router.get("/:id",userController.getUserbyId);
+router.get("/",userController.getAllusers)
 
-// router.use(verifyJWT)
-
-router
-  .route("/")
-  .get(userController.getAllusers)
-  .patch(userController.updateUser)
-  .delete(userController.deleteUser);
-
+router.use(verifyJWT)
+router.patch("/:id",userController.updateUser)
+router.delete("/:id",userController.deleteUser);
 
 module.exports = router;

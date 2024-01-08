@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../config/multerConfig");
+const {videoUpload} = require("../config/multerConfig");
 
 const {
   getAllFiles,
@@ -12,6 +12,7 @@ const {
   deleteAllFiles,
   deleteAllFIlesbyUser,
   updateFile,
+  getFilesByCategory,
 } = require("./uploadController");
 const verifyJWT = require("../middleware/verifyJWT");
 
@@ -19,8 +20,9 @@ router.get("/file/:id", getFilebyId);
 router.get("/allFiles", getAllFiles);
 router.get("/allFiles/:id", getAllFIlesbyUser);
 router.get("/stream/:id", streamFile);
+router.get("/:category", getFilesByCategory)
 router.use(verifyJWT)
-router.post("/upload", upload, uploadFile);
+router.post("/upload", videoUpload, uploadFile);
 router.patch("/update/:id", updateFile);
 router.delete("/delete/:id", deleteFile);
 router.delete("/deleteall/:id", deleteAllFIlesbyUser);

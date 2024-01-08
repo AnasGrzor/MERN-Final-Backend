@@ -51,8 +51,9 @@ const createUser = asyncHandler(async (req, res) => {
 // @route PATCh /users
 // @access Private
 const updateUser = asyncHandler(async (req, res) => {
-  const { id, username, email, password } = req.body;
-  if (!id, !username, !email, !password) {
+  const { username, email } = req.body;
+  const { id } = req.params;
+  if (!id, !username, !email) {
       return res.status(400).json({ message: "All fields are required" });
   }
   const user = await User.findById(id).exec();
@@ -68,14 +69,12 @@ const updateUser = asyncHandler(async (req, res) => {
   user.username = username;
   user.email = email;
 
-  if (password) {
-      user.password = await bcrypt.hash(password, 10);
-  }
-
   const updatedUser = await user.save();
 
-  res.json({ message: `${updatedUser.username} updated` });
-
+  res.json({
+    username: updatedUser.username,
+    email: updatedUser.email,
+    message: `${updatedUser.username} updated` });
 })
 
 // @desc Delete a user

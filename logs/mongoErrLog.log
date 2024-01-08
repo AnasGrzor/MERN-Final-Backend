@@ -1,0 +1,4 @@
+20231228	19:41:34	42b1bf37-54fc-4e2f-9e3f-cfb582b623fc	undefined: ESERVFAIL	querySrv	_mongodb._tcp.cluster0.7w4nrtz.mongodb.net
+20231228	22:36:15	43b196e5-02bc-4ab4-b522-44cd391107c3	undefined: ESERVFAIL	queryTxt	cluster0.7w4nrtz.mongodb.net
+20240108	17:05:44	199204ae-d62c-4ac4-b70b-60f2b5a49294	undefined: ESERVFAIL	queryTxt	cluster0.7w4nrtz.mongodb.net
+20240108	17:48:44	5219fab3-077c-4aa8-be08-ee4bb8328380	undefined: ESERVFAIL	querySrv	_mongodb._tcp.cluster0.7w4nrtz.mongodb.net
